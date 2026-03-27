@@ -16,7 +16,8 @@ import {
   WandSparkles,
   X,
 } from "lucide-react";
-import { toast } from "react-toastify";
+import { appToast } from "@/components/app-toast";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +28,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { CustomScrollShell } from "@/components/custom-scroll-shell";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -56,6 +58,18 @@ type SelectedFile = {
   extension: string;
   sizeLabel: string;
 };
+
+const shellCardClass =
+  "border-white/65 bg-white/84 shadow-[0_28px_80px_-46px_rgba(15,23,42,0.42)] dark:border-white/10 dark:bg-[#101923]/92 dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.68)]";
+
+const statCardClass =
+  "rounded-[1.4rem] border border-white/55 bg-white/72 p-4 shadow-[0_18px_46px_-36px_rgba(15,23,42,0.34)] dark:border-white/10 dark:bg-[#13212c]/78";
+
+const queueItemClass =
+  "border-border/70 rounded-[1.4rem] border bg-white/78 p-3 shadow-[0_16px_44px_-34px_rgba(15,23,42,0.26)] dark:border-white/10 dark:bg-[#16212b]/80";
+
+const infoTileClass =
+  "border-border/70 bg-muted/45 flex items-start gap-3 rounded-[1.2rem] border p-4 dark:border-white/10 dark:bg-[#14212c]/78";
 
 function formatBytes(bytes: number) {
   if (bytes === 0) {
@@ -174,7 +188,11 @@ export function ImageConverter() {
     });
 
     if (!imageFiles.length) {
-      toast.error("Pilih file gambar yang valid dulu ya.");
+      appToast.error({
+        title: "File belum valid",
+        description:
+          "Tambahkan gambar dengan format yang didukung supaya bisa masuk ke antrean.",
+      });
       return;
     }
 
@@ -186,9 +204,10 @@ export function ImageConverter() {
     );
 
     if (oversizedFiles.length > 0) {
-      toast.warning(
-        `${oversizedFiles.length} file dilewati karena melebihi ${MAX_FILE_SIZE_MB} MB.`,
-      );
+      appToast.warning({
+        title: "Sebagian file dilewati",
+        description: `${oversizedFiles.length} file melewati batas ${MAX_FILE_SIZE_MB} MB per file.`,
+      });
     }
 
     if (!safeFiles.length) {
@@ -202,7 +221,10 @@ export function ImageConverter() {
       ]);
     });
 
-    toast.success(`${safeFiles.length} file siap dikonversi.`);
+    appToast.success({
+      title: "File masuk ke antrean",
+      description: `${safeFiles.length} file siap dikonversi ke ${outputFormat.toUpperCase()}.`,
+    });
   }
 
   function handleFileSelection(event: ChangeEvent<HTMLInputElement>) {
@@ -235,7 +257,11 @@ export function ImageConverter() {
 
   async function handleConvert() {
     if (!selectedFiles.length) {
-      toast.error("Tambahkan minimal satu gambar dulu.");
+      appToast.error({
+        title: "Antrean masih kosong",
+        description:
+          "Tambahkan minimal satu gambar dulu sebelum mulai convert.",
+      });
       return;
     }
 
@@ -280,17 +306,20 @@ export function ImageConverter() {
         ),
       );
 
-      toast.success(
-        batchWillZip
-          ? `${selectedFiles.length} file berhasil dikonversi dan dibungkus ke ZIP.`
-          : `${selectedFiles[0]?.file.name} berhasil dikonversi.`,
-      );
+      appToast.success({
+        title: "Konversi selesai",
+        description: batchWillZip
+          ? `${selectedFiles.length} file berhasil dikonversi dan langsung dibungkus ke ZIP.`
+          : `${selectedFiles[0]?.file.name} berhasil dikonversi ke ${outputFormat.toUpperCase()}.`,
+      });
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Terjadi error yang tidak dikenal.",
-      );
+      appToast.error({
+        title: "Konversi gagal",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Terjadi error yang tidak dikenal.",
+      });
     } finally {
       setIsConverting(false);
     }
@@ -298,19 +327,26 @@ export function ImageConverter() {
 
   return (
     <div className="flex flex-1 flex-col gap-6 lg:gap-8">
-      <section className="border-border/70 relative overflow-hidden rounded-[2rem] border bg-white/80 p-6 shadow-[0_30px_90px_-48px_rgba(15,23,42,0.45)] backdrop-blur xl:p-8">
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/70 via-white/55 to-white/20" />
-        <div className="pointer-events-none absolute -top-16 right-0 size-72 rounded-full bg-[#0f766e]/12 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 left-0 size-72 rounded-full bg-[#fb923c]/12 blur-3xl" />
+      <section
+        className={cn(
+          "border-border/70 relative overflow-hidden rounded-[2rem] border p-6 xl:p-8",
+          shellCardClass,
+        )}
+      >
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(15,118,110,0.14),transparent_34%),radial-gradient(circle_at_100%_10%,rgba(251,146,60,0.1),transparent_24%),linear-gradient(135deg,rgba(255,255,255,0.74),rgba(255,255,255,0.08))] dark:bg-[radial-gradient(circle_at_0%_0%,rgba(45,212,191,0.14),transparent_32%),radial-gradient(circle_at_96%_12%,rgba(251,146,60,0.07),transparent_22%),linear-gradient(135deg,rgba(19,31,43,0.9),rgba(11,18,26,0.26))]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/75 to-transparent dark:via-white/14" />
 
         <div className="relative grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-end">
           <div className="space-y-5">
-            <div className="flex flex-wrap gap-2">
-              <Badge className="bg-[#0f766e] text-white hover:bg-[#0f766e]">
-                shadcn-ui
-              </Badge>
-              <Badge variant="outline">sharp server converter</Badge>
-              <Badge variant="outline">React Toastify</Badge>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap gap-2">
+                <Badge className="bg-[#0f766e] text-white hover:bg-[#0f766e]">
+                  shadcn-ui
+                </Badge>
+                <Badge variant="outline">sharp server converter</Badge>
+                <Badge variant="outline">React Toastify</Badge>
+              </div>
+              <ThemeToggle />
             </div>
 
             <div className="space-y-3">
@@ -355,7 +391,7 @@ export function ImageConverter() {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
-            <div className="rounded-[1.4rem] border border-white/60 bg-white/70 p-4 backdrop-blur">
+            <div className={statCardClass}>
               <p className="text-muted-foreground text-sm">Format input</p>
               <p className="mt-2 text-3xl font-semibold">
                 {INPUT_EXTENSIONS.length}+
@@ -364,7 +400,7 @@ export function ImageConverter() {
                 PNG, JPG, WEBP, HEIC, SVG, dan lainnya.
               </p>
             </div>
-            <div className="rounded-[1.4rem] border border-white/60 bg-white/70 p-4 backdrop-blur">
+            <div className={statCardClass}>
               <p className="text-muted-foreground text-sm">Format output</p>
               <p className="mt-2 text-3xl font-semibold">
                 {OUTPUT_FORMATS.length}
@@ -373,7 +409,7 @@ export function ImageConverter() {
                 JPG, PNG, WEBP, AVIF, dan TIFF.
               </p>
             </div>
-            <div className="rounded-[1.4rem] border border-white/60 bg-white/70 p-4 backdrop-blur">
+            <div className={statCardClass}>
               <p className="text-muted-foreground text-sm">
                 Batch sekali jalan
               </p>
@@ -387,7 +423,7 @@ export function ImageConverter() {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_380px]">
-        <Card className="border-white/70 bg-white/85 shadow-[0_26px_70px_-44px_rgba(15,23,42,0.48)] backdrop-blur">
+        <Card className={shellCardClass}>
           <CardHeader className="gap-3">
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -416,10 +452,10 @@ export function ImageConverter() {
 
             <div
               className={cn(
-                "rounded-[1.8rem] border border-dashed px-6 py-10 transition-all",
+                "rounded-[1.8rem] border border-dashed px-6 py-10 transition-[background-color,border-color,box-shadow,transform] duration-200",
                 isDragging
                   ? "border-[#0f766e] bg-[#0f766e]/6 shadow-[inset_0_0_0_1px_rgba(15,118,110,0.2)]"
-                  : "border-border/80 bg-[#f8faf8]",
+                  : "border-border/80 bg-[#f8faf8] dark:border-white/12 dark:bg-[#10212b]/88",
               )}
               onDragEnter={(event) => {
                 event.preventDefault();
@@ -433,7 +469,7 @@ export function ImageConverter() {
               onDrop={handleDrop}
             >
               <div className="mx-auto flex max-w-xl flex-col items-center gap-4 text-center">
-                <div className="flex size-16 items-center justify-center rounded-[1.4rem] bg-[#0f766e]/12 text-[#0f766e]">
+                <div className="flex size-16 items-center justify-center rounded-[1.4rem] bg-[#0f766e]/12 text-[#0f766e] dark:bg-[#0f766e]/20 dark:text-[#6be3d8]">
                   <ImagePlus className="size-8" />
                 </div>
 
@@ -488,15 +524,15 @@ export function ImageConverter() {
               </div>
 
               {selectedFiles.length ? (
-                <div className="grid max-h-[30rem] gap-3 overflow-y-auto pr-1 sm:grid-cols-2">
+                <CustomScrollShell
+                  className="queue-scroll-shell w-full"
+                  viewportClassName="grid max-h-[30rem] gap-3 sm:grid-cols-2"
+                >
                   {selectedFiles.map((entry) => (
-                    <div
-                      className="border-border/70 rounded-[1.4rem] border bg-white/80 p-3 shadow-sm"
-                      key={entry.id}
-                    >
+                    <div className={queueItemClass} key={entry.id}>
                       <div className="flex items-start gap-3">
-                        <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-[#0f766e]/12 via-white to-[#fb923c]/18">
-                          <FileImage className="size-6 text-[#0f766e]" />
+                        <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-[#0f766e]/12 via-white to-[#fb923c]/18 dark:from-[#0f766e]/18 dark:via-white/5 dark:to-[#fb923c]/20">
+                          <FileImage className="size-6 text-[#0f766e] dark:text-[#6be3d8]" />
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             alt=""
@@ -533,9 +569,9 @@ export function ImageConverter() {
                       </div>
                     </div>
                   ))}
-                </div>
+                </CustomScrollShell>
               ) : (
-                <div className="border-border/80 bg-muted/40 rounded-[1.4rem] border border-dashed px-5 py-10 text-center">
+                <div className="border-border/80 bg-muted/40 rounded-[1.4rem] border border-dashed px-5 py-10 text-center dark:border-white/10 dark:bg-[#14202a]/80">
                   <Sparkles className="mx-auto mb-3 size-6 text-[#0f766e]" />
                   <p className="font-medium">Belum ada file di antrean.</p>
                   <p className="text-muted-foreground mt-2 text-sm">
@@ -548,7 +584,7 @@ export function ImageConverter() {
         </Card>
 
         <div className="space-y-6">
-          <Card className="border-white/70 bg-white/85 shadow-[0_26px_70px_-44px_rgba(15,23,42,0.48)] backdrop-blur">
+          <Card className={shellCardClass}>
             <CardHeader className="gap-3">
               <CardTitle className="text-xl">Pengaturan output</CardTitle>
               <CardDescription>
@@ -611,7 +647,7 @@ export function ImageConverter() {
               <Separator />
 
               <div className="grid gap-3">
-                <div className="border-border/70 bg-muted/35 flex items-start gap-3 rounded-[1.2rem] border p-4">
+                <div className={infoTileClass}>
                   <ScanSearch className="mt-0.5 size-5 text-[#0f766e]" />
                   <div>
                     <p className="font-medium">
@@ -623,7 +659,7 @@ export function ImageConverter() {
                   </div>
                 </div>
 
-                <div className="border-border/70 bg-muted/35 flex items-start gap-3 rounded-[1.2rem] border p-4">
+                <div className={infoTileClass}>
                   <FileArchive className="mt-0.5 size-5 text-[#0f766e]" />
                   <div>
                     <p className="font-medium">
@@ -639,7 +675,7 @@ export function ImageConverter() {
                   </div>
                 </div>
 
-                <div className="border-border/70 bg-muted/35 flex items-start gap-3 rounded-[1.2rem] border p-4">
+                <div className={infoTileClass}>
                   <WandSparkles className="mt-0.5 size-5 text-[#0f766e]" />
                   <div>
                     <p className="font-medium">
@@ -683,7 +719,7 @@ export function ImageConverter() {
             </CardFooter>
           </Card>
 
-          <Card className="border-white/70 bg-white/85 shadow-[0_26px_70px_-44px_rgba(15,23,42,0.48)] backdrop-blur">
+          <Card className={shellCardClass}>
             <CardHeader className="gap-3">
               <CardTitle className="text-xl">
                 Yang sudah disiapkan di project

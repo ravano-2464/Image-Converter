@@ -36,6 +36,8 @@ This project is useful for:
 - Multi-file results are automatically downloaded as `.zip`
 - Queue preview before conversion
 - Quality slider for lossy formats
+- Dark mode and light mode toggle with saved user preference
+- Custom global scrollbar styling for both themes
 - Modern UI built with `shadcn-ui`
 - Success and error notifications using `React Toastify`
 - Ready-to-use `ESLint` and `Prettier` setup
@@ -99,56 +101,60 @@ npm run format:check
 
 ## 🗂️ Project Structure
 
-> The tree below reflects the current project structure in this repository.  
-> Generated/internal folders such as `.git`, `.next`, and `node_modules` are shown at folder level because their contents are created automatically.
+> The tree below reflects the current project structure in this repository.
+> Auto-generated/internal folders such as `.git`, `.next`, and `node_modules` are shown only at folder level.
 
 ```text
 📦 Image Converter
-├── 📁 .git/                             # Git repository metadata
-├── 📁 .next/                            # Next.js generated cache and build output
-├── 📁 node_modules/                     # Installed npm dependencies
-├── 📁 public/                           # Static assets served directly by Next.js
-│   ├── 🖼️ file.svg                      # Default SVG asset from the initial scaffold
-│   ├── 🖼️ globe.svg                     # Decorative scaffold SVG asset
-│   ├── 🖼️ next.svg                      # Next.js logo asset
-│   ├── 🖼️ vercel.svg                    # Vercel logo asset
-│   └── 🖼️ window.svg                    # Extra scaffold SVG asset
-├── 📁 src/                              # Main application source code
-│   ├── 📁 app/                          # Next.js App Router files: pages, layouts, route handlers
-│   │   ├── 📁 api/                      # Server-side API routes
-│   │   │   └── 📁 convert/              # Image conversion endpoint
-│   │   │       └── 📄 route.ts          # POST handler for image conversion and ZIP generation
-│   │   ├── 🖼️ favicon.ico               # Browser tab icon for the application
-│   │   ├── 🎨 globals.css               # Global styles, color tokens, background, and Toastify styling
-│   │   ├── 📄 layout.tsx                # Root layout, metadata, font setup, and toast provider mounting
-│   │   └── 📄 page.tsx                  # Main homepage rendering the image converter UI
-│   ├── 📁 components/                   # Reusable React components
-│   │   ├── 📁 ui/                       # shadcn-ui primitives used across the app
-│   │   │   ├── 📄 badge.tsx             # Reusable badge component
-│   │   │   ├── 📄 button.tsx            # Reusable button component
-│   │   │   ├── 📄 card.tsx              # Reusable card/container component
-│   │   │   ├── 📄 input.tsx             # Reusable input component
-│   │   │   ├── 📄 label.tsx             # Reusable form label component
-│   │   │   ├── 📄 select.tsx            # Reusable select/dropdown component
-│   │   │   ├── 📄 separator.tsx         # Reusable visual separator component
-│   │   │   └── 📄 slider.tsx            # Reusable slider component for quality control
-│   │   ├── 📄 image-converter.tsx       # Main upload, preview, queue, and conversion UI
-│   │   └── 📄 toast-provider.tsx        # React Toastify container wrapper
-│   └── 📁 lib/                          # Shared utilities and constants
-│       ├── 📄 image-formats.ts          # Supported image formats, MIME map, and size limits
-│       └── 📄 utils.ts                  # `cn()` helper for merging Tailwind and clsx classes
-├── ⚙️ .gitignore                        # Git ignore rules
-├── ⚙️ .prettierignore                   # Prettier ignore rules
-├── ⚙️ components.json                   # shadcn-ui project configuration
-├── ⚙️ eslint.config.mjs                 # ESLint configuration
-├── ⚙️ next-env.d.ts                     # Next.js TypeScript environment declarations
-├── ⚙️ next.config.ts                    # Next.js configuration file
-├── 📦 package-lock.json                 # npm lockfile
-├── ⚙️ package.json                      # Project scripts, dependencies, and metadata
-├── ⚙️ postcss.config.mjs                # PostCSS configuration for Tailwind CSS
-├── 📝 prettier.config.mjs               # Prettier configuration
-├── 📝 README.md                         # Project documentation
-└── ⚙️ tsconfig.json                     # TypeScript configuration
+├── 📁 .git/                               # Git repository metadata
+├── 📁 .next/                              # Next.js generated cache and build output
+├── 📁 node_modules/                       # Installed npm dependencies
+├── 📁 public/                             # Static assets served directly by Next.js
+│   ├── 🖼️ file.svg                        # Default file icon asset from the base scaffold
+│   ├── 🖼️ globe.svg                       # Decorative globe asset from the base scaffold
+│   ├── 🖼️ next.svg                        # Next.js logo asset
+│   ├── 🖼️ vercel.svg                      # Vercel logo asset
+│   └── 🖼️ window.svg                      # Decorative window asset from the base scaffold
+├── 📁 src/                                # Main application source code
+│   ├── 📁 app/                            # Next.js App Router entry points, layout, and route handlers
+│   │   ├── 📁 api/                        # Server-side API routes
+│   │   │   └── 📁 convert/                # Image conversion endpoint
+│   │   │       └── 📄 route.ts            # POST handler for image conversion and ZIP packaging
+│   │   ├── 🖼️ favicon.ico                 # Browser tab icon
+│   │   ├── 🎨 globals.css                 # Global theme tokens, page styling, custom scrollbar, and toast styles
+│   │   ├── 📄 layout.tsx                  # Root layout, metadata, fonts, theme initialization, and providers
+│   │   └── 📄 page.tsx                    # Home page that mounts the main converter inside the page scroll shell
+│   ├── 📁 components/                     # Reusable React components and UI building blocks
+│   │   ├── 📁 ui/                         # Base UI primitives adapted from shadcn-ui / base-nova
+│   │   │   ├── 📄 badge.tsx               # Reusable badge component
+│   │   │   ├── 📄 button.tsx              # Reusable button component
+│   │   │   ├── 📄 card.tsx                # Reusable card and card section components
+│   │   │   ├── 📄 input.tsx               # Reusable text/file input component
+│   │   │   ├── 📄 label.tsx               # Reusable form label component
+│   │   │   ├── 📄 select.tsx              # Reusable select/dropdown component
+│   │   │   ├── 📄 separator.tsx           # Reusable visual separator component
+│   │   │   └── 📄 slider.tsx              # Reusable slider component for quality control
+│   │   ├── 📄 app-toast.tsx               # Custom toast content, tone mapping, and toast helper API
+│   │   ├── 📄 custom-scroll-shell.tsx     # Reusable custom vertical scrollbar shell for page and queue areas
+│   │   ├── 📄 image-converter.tsx         # Main upload, preview, queue, settings, and conversion UI
+│   │   ├── 📄 theme-provider.tsx          # Global theme state with hydration-safe localStorage persistence
+│   │   ├── 📄 theme-toggle.tsx            # Light/dark mode toggle button
+│   │   └── 📄 toast-provider.tsx          # React Toastify container wrapper and transition setup
+│   └── 📁 lib/                            # Shared constants and helper utilities
+│       ├── 📄 image-formats.ts            # Supported formats, MIME mapping, output metadata, and file size limits
+│       └── 📄 utils.ts                    # `cn()` helper for merging Tailwind and clsx classes
+├── ⚙️ .gitignore                          # Git ignore rules
+├── ⚙️ .prettierignore                     # Prettier ignore rules
+├── ⚙️ components.json                     # shadcn-ui component registry/project configuration
+├── ⚙️ eslint.config.mjs                   # ESLint configuration
+├── ⚙️ next-env.d.ts                       # Next.js TypeScript environment declarations
+├── ⚙️ next.config.ts                      # Next.js configuration file
+├── 📦 package-lock.json                   # npm lockfile
+├── ⚙️ package.json                        # Project scripts, dependencies, and metadata
+├── ⚙️ postcss.config.mjs                  # PostCSS configuration for Tailwind CSS
+├── 📝 prettier.config.mjs                 # Prettier configuration
+├── 📝 README.md                           # Project documentation
+└── ⚙️ tsconfig.json                       # TypeScript configuration
 ```
 
 ## 🎯 Important Folder Notes
@@ -168,7 +174,11 @@ It contains:
 This folder contains the React components used by the UI.
 
 - `image-converter.tsx` is the core application component
-- `toast-provider.tsx` mounts the notification container
+- `custom-scroll-shell.tsx` handles the reusable custom scrollbar shell
+- `app-toast.tsx` centralizes custom toast content and toast helper functions
+- `theme-provider.tsx` manages the active light/dark theme
+- `theme-toggle.tsx` provides the theme switch button in the interface
+- `toast-provider.tsx` mounts the notification container and toast transitions
 - `ui/` stores reusable primitives generated and adapted from `shadcn-ui`
 
 ### `src/lib/`
@@ -210,13 +220,14 @@ It is automatically created by npm and should not be edited manually.
 - Batch conversion is now **unlimited by file count**
 - The active limit is still **25 MB per file**
 - If more than one file is converted, the result is automatically packaged as a ZIP archive
+- The selected theme is persisted in `localStorage`
+- Scrollbars are styled globally for both light mode and dark mode
 - Conversion happens in a Next.js server route for better format support and more reliable processing
 
 ## 💡 Future Improvement Ideas
 
 - add resize mode
 - add compress-only mode
-- add a dark mode switcher
 - add drag-to-sort queue support
 - add conversion history
 - add per-format quality presets
